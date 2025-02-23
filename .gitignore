@@ -4,3 +4,4 @@ REBUSS.PromptManager/bin/
 REBUSS.PromptManager/obj/
 *.user
 REBUSS.PromptManager/.vsextension/
+REBUSS.PromptManager.UnitTests/bin/
