@@ -1,0 +1,6 @@
+.vs/
+REBUSS.PromptManager.UnitTests/obj/
+REBUSS.PromptManager/bin/
+REBUSS.PromptManager/obj/
+*.user
+REBUSS.PromptManager/.vsextension/
