@@ -18,8 +18,6 @@
     <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.9.2092" />
   </ItemGroup>
   <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>REBUSS.PromptManager.UnitTests</_Parameter1>
-    </AssemblyAttribute>
+    <ProjectReference Include="..\REBUSS.PromptManager.Core\REBUSS.PromptManager.Core.csproj" />
   </ItemGroup>
 </Project>

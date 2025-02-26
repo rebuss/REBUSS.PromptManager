@@ -1,9 +1,10 @@
-﻿using REBUSS.PromptManager.Model;
+﻿using REBUSS.PromptManager.Core.Model;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
-namespace REBUSS.PromptManager
+namespace REBUSS.PromptManager.Core
 {
-    internal class SettingsManager
+    public class SettingsManager
     {
         private static string settingsPath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -18,7 +19,12 @@ namespace REBUSS.PromptManager
                 Directory.CreateDirectory(directory);
             }
 
-            string json = JsonSerializer.Serialize(nodes);
+            var options = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
+
+            string json = JsonSerializer.Serialize(nodes, options);
             File.WriteAllText(settingsPath, json);
         }
 

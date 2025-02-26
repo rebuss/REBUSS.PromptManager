@@ -5,7 +5,7 @@
               xmlns:colors="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0" 
               xmlns:System="clr-namespace:System;assembly=mscorlib"
               xmlns:promptmanager="clr-namespace:REBUSS.PromptManager" 
-              xmlns:model="clr-namespace:REBUSS.PromptManager.Model">
+              xmlns:model="clr-namespace:REBUSS.PromptManager.Core.Model;assembly=REBUSS.PromptManager.Core">
     <Grid Name="RootGrid">
         <Grid.Resources>
 
@@ -28,18 +28,7 @@
                 <Setter Property="FontFamily" Value="Segoe Fluent Icons" />
                 <Setter Property="FontSize" Value="16" />
             </Style>
-
-            <Style TargetType="ContentControl" x:Key="IconStyle">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsContainer}" Value="True">
-                        <Setter Property="Content" Value="{StaticResource FolderOpened}" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding IsContainer}" Value="False">
-                        <Setter Property="Content" Value="{StaticResource TextFile}" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-
+            
             <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         </Grid.Resources>
         <Grid.RowDefinitions>
@@ -58,8 +47,15 @@
                   Grid.Column="0" 
                   Margin="10"
                   AllowDrop="True"
-                  SelectedValuePath="SelectedNode"
                   ItemsSource="{Binding Nodes}">
+            <vs:ExtensibilityUICommands.EventHandlers>
+                <vs:EventHandlerCollection>
+                    <vs:EventHandler Event="SelectedItemChanged"
+                             Command="{Binding SelectedItemChangedCommand}"
+                             CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=TreeView}}"
+                             CounterTarget="{Binding RelativeSource={RelativeSource Self}}" />
+                </vs:EventHandlerCollection>
+            </vs:ExtensibilityUICommands.EventHandlers>
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Nodes}">
                     <StackPanel Orientation="Horizontal">

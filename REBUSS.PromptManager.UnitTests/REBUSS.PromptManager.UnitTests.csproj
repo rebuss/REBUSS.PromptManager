@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
+    <ExtensibilityProject>false</ExtensibilityProject>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
@@ -17,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\REBUSS.PromptManager\REBUSS.PromptManager.csproj" />
+    <ProjectReference Include="..\REBUSS.PromptManager.Core\REBUSS.PromptManager.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

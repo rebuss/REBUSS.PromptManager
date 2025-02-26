@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.Extensibility;
 using Microsoft.VisualStudio.Extensibility.UI;
-using REBUSS.PromptManager.Commands;
-using REBUSS.PromptManager.Model;
+using REBUSS.PromptManager.Core;
+using REBUSS.PromptManager.Core.Model;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using System.Windows;
@@ -24,42 +24,44 @@ namespace REBUSS.PromptManager.PromptToolWindow
             CreateGroupCommand = new AsyncCommand(CreateGroup);
             CopyPromptCommand = new AsyncCommand(CopyPrompt);
             SavePromptsCommand = new AsyncCommand(SavePrompts);
-            foreach (var node in SettingsManager.LoadSettings())
+            SelectedItemChangedCommand = new AsyncCommand((parameter, clientContext, cancellationToken) =>
             {
-                Nodes.Add(node);
-            }
-
-            CommandStartegy = new PromptCommands(Nodes);
+                SelectedNode = (Node)parameter;
+                return Task.CompletedTask;
+            });
+            SettingsManager.LoadSettings();
+            Nodes = Group.Root.Nodes;
+            Commands = new Commands(Group.Root);
         }
 
         [DataMember]
-        public Node SelectedNode 
-        { 
+        public Node SelectedNode
+        {
             get => selectedNode;
-            set 
-            { 
+            set
+            {
                 SetProperty(ref this.selectedNode, value);
                 UpdateCommands();
             }
         }
 
-        [DataMember]
-        public ICommandStrategy CommandStartegy { get; set; }
-
         private void UpdateCommands()
         {
-            if (SelectedNode?.IsGroup == true)
+            if(SelectedNode is Group)
             {
-                CommandStartegy = new GroupCommands(SelectedNode.Nodes);
+                Commands = new Commands((Group)SelectedNode);
             }
             else
             {
-                CommandStartegy = new PromptCommands(Nodes);
+                Commands = new Commands(Group.Root);
             }
         }
 
         [DataMember]
-        public ObservableCollection<Node> Nodes { get; set; } = new ObservableCollection<Node>();
+        public Commands Commands { get; set; }
+
+        [DataMember]
+        public ObservableCollection<Node> Nodes { get; set; }
 
         [DataMember]
         public string Name
@@ -67,6 +69,9 @@ namespace REBUSS.PromptManager.PromptToolWindow
             get => _name;
             set => SetProperty(ref this._name, value);
         }
+
+        [DataMember]
+        public AsyncCommand SelectedItemChangedCommand { get; }
 
         [DataMember]
         public AsyncCommand AddPromptCommand { get; }
@@ -91,19 +96,19 @@ namespace REBUSS.PromptManager.PromptToolWindow
 
         private Task AddPrompt(object? parameter, IClientContext clientContext, CancellationToken cancellationToken)
         {
-            CommandStartegy.AddNewPrompt();
+            Commands.AddNewPrompt();
             return Task.CompletedTask;
         }
 
         private Task RemoveSelectedPrompt(object? parameter, IClientContext clientContext, CancellationToken cancellationToken)
         {
-            CommandStartegy.Remove(SelectedNode);
+            Commands.Remove(SelectedNode);
             return Task.CompletedTask;
         }
 
         private Task CreateGroup(object? parameter, IClientContext clientContext, CancellationToken cancellationToken)
         {
-            CommandStartegy.AddNewGroup();
+            Commands.AddNewGroup();
             return Task.CompletedTask;
         }
 

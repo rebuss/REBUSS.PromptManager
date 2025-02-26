@@ -5,3 +5,6 @@ REBUSS.PromptManager/obj/
 *.user
 REBUSS.PromptManager/.vsextension/
 REBUSS.PromptManager.UnitTests/bin/
+REBUSS.PromptManager.Core/bin/
+REBUSS.PromptManager.Core/obj/project.assets.json
+REBUSS.PromptManager.Core/obj/
