@@ -23,6 +23,7 @@ namespace REBUSS.PromptManager.Core
             {
                 ReferenceHandler = ReferenceHandler.Preserve
             };
+            options.Converters.Add(new NodeConverter());
 
             string json = JsonSerializer.Serialize(nodes, options);
             File.WriteAllText(settingsPath, json);
@@ -38,7 +39,14 @@ namespace REBUSS.PromptManager.Core
             string json = File.ReadAllText(settingsPath);
             var options = new JsonSerializerOptions();
             options.Converters.Add(new NodeConverter());
-            return JsonSerializer.Deserialize<Node[]>(json) ?? Array.Empty<Node>();
+            try
+            {
+                return JsonSerializer.Deserialize<Node[]>(json, options) ?? Array.Empty<Node>();
+            }
+            catch (Exception)
+            {
+                return Array.Empty<Node>();
+            }
         }
     }
 }

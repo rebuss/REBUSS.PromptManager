@@ -63,7 +63,19 @@ namespace REBUSS.PromptManager.Core
         {
             try
             {
-                JsonSerializer.Serialize(writer, value, options);
+                writer.WriteStartObject();
+
+                writer.WriteString("Name", value.Name);
+                writer.WriteString("Value", value.Value);
+                writer.WriteBoolean("IsGroup", value.IsGroup);
+
+                if (value.Nodes != null && value.Nodes.Count > 0)
+                {
+                    writer.WritePropertyName("Nodes");
+                    JsonSerializer.Serialize(writer, value.Nodes.ToArray(), options);
+                }
+
+                writer.WriteEndObject();
             }
             catch (Exception ex)
             {

@@ -6,11 +6,12 @@ namespace REBUSS.PromptManager.Core.Model
     [DataContract]
     public class Node : NotifyPropertyChangedObject
     {
+        private bool isSelected = false;
         private string name;
-        private string value;
         private Node parent;
+        private string value;
 
-        internal Node()
+        public Node()
         {
         }
 
@@ -18,7 +19,7 @@ namespace REBUSS.PromptManager.Core.Model
         {
         }
 
-        public Node(Node parent) : this(parent, string.Empty, string.Empty)
+        public Node(Node parent) : this(parent, "New Prompt", string.Empty)
         {
         }
 
@@ -35,10 +36,36 @@ namespace REBUSS.PromptManager.Core.Model
         }
 
         [DataMember]
+        public bool IsEditing { get; set; } = false;
+
+        [DataMember]
+        public virtual bool IsGroup { get; } = false;
+
+        [DataMember]
+        public bool IsPrompt => !IsGroup;
+
+        [DataMember]
+        public bool IsSelected
+        {
+            get => isSelected;
+            set => SetProperty(ref isSelected, value);
+        }
+
+        [DataMember]
         public string Name
         {
             get => name;
             set => SetProperty(ref name, value);
+        }
+
+        [DataMember]
+        public virtual ObservableCollection<Node> Nodes { get; } = null;
+
+        [IgnoreDataMember]
+        public Node Parent
+        {
+            get => parent;
+            set { parent = value ?? Group.Root; }
         }
 
         [DataMember]
@@ -47,28 +74,5 @@ namespace REBUSS.PromptManager.Core.Model
             get => value;
             set => SetProperty(ref this.value, value);
         }
-
-        [DataMember]
-        public virtual bool IsGroup { get; } = false;
-
-        [DataMember]
-        public bool IsPrompt => !IsGroup;
-
-        public Node Parent
-        {
-            get => parent;
-            set
-            {
-                if (value is null)
-                {
-                    throw new ArgumentNullException(nameof(value));
-                }
-
-                parent = value;
-            }
-        }
-
-        [DataMember]
-        public virtual ObservableCollection<Node> Nodes { get; } = null;
     }
 }

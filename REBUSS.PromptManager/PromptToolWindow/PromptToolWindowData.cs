@@ -14,8 +14,8 @@ namespace REBUSS.PromptManager.PromptToolWindow
     [DataContract]
     internal class PromptToolWindowData : NotifyPropertyChangedObject
     {
-        private Node selectedNode;
         private string _name = string.Empty;
+        private Node selectedNode;
 
         public PromptToolWindowData()
         {
@@ -29,10 +29,42 @@ namespace REBUSS.PromptManager.PromptToolWindow
                 SelectedNode = (Node)parameter;
                 return Task.CompletedTask;
             });
-            SettingsManager.LoadSettings();
+            UnselectAllCommand = new AsyncCommand(UnselectAll);
+            Group.Root.SetNodes(SettingsManager.LoadSettings());
             Nodes = Group.Root.Nodes;
             Commands = new Commands(Group.Root);
         }
+
+        [DataMember]
+        public AsyncCommand AddPromptCommand { get; }
+
+        [DataMember]
+        public Commands Commands { get; set; }
+
+        [DataMember]
+        public AsyncCommand CopyPromptCommand { get; }
+
+        [DataMember]
+        public AsyncCommand CreateGroupCommand { get; }
+
+        [DataMember]
+        public string Name
+        {
+            get => _name;
+            set => SetProperty(ref this._name, value);
+        }
+
+        [DataMember]
+        public ObservableCollection<Node> Nodes { get; set; }
+
+        [DataMember]
+        public AsyncCommand RemoveSelectedPromptsCommand { get; }
+
+        [DataMember]
+        public AsyncCommand SavePromptsCommand { get; }
+
+        [DataMember]
+        public AsyncCommand SelectedItemChangedCommand { get; }
 
         [DataMember]
         public Node SelectedNode
@@ -45,54 +77,8 @@ namespace REBUSS.PromptManager.PromptToolWindow
             }
         }
 
-        private void UpdateCommands()
-        {
-            if(SelectedNode is Group)
-            {
-                Commands = new Commands((Group)SelectedNode);
-            }
-            else
-            {
-                Commands = new Commands(Group.Root);
-            }
-        }
-
         [DataMember]
-        public Commands Commands { get; set; }
-
-        [DataMember]
-        public ObservableCollection<Node> Nodes { get; set; }
-
-        [DataMember]
-        public string Name
-        {
-            get => _name;
-            set => SetProperty(ref this._name, value);
-        }
-
-        [DataMember]
-        public AsyncCommand SelectedItemChangedCommand { get; }
-
-        [DataMember]
-        public AsyncCommand AddPromptCommand { get; }
-
-        [DataMember]
-        public AsyncCommand SavePromptsCommand { get; }
-
-        [DataMember]
-        public AsyncCommand RemoveSelectedPromptsCommand { get; }
-
-        [DataMember]
-        public AsyncCommand CreateGroupCommand { get; }
-
-        [DataMember]
-        public AsyncCommand CopyPromptCommand { get; }
-
-        private Task SavePrompts(object? parameter, IClientContext clientContext, CancellationToken cancellationToken)
-        {
-            SettingsManager.SaveSettings(Nodes.ToArray());
-            return Task.CompletedTask;
-        }
+        public AsyncCommand UnselectAllCommand { get; }
 
         private Task AddPrompt(object? parameter, IClientContext clientContext, CancellationToken cancellationToken)
         {
@@ -100,9 +86,10 @@ namespace REBUSS.PromptManager.PromptToolWindow
             return Task.CompletedTask;
         }
 
-        private Task RemoveSelectedPrompt(object? parameter, IClientContext clientContext, CancellationToken cancellationToken)
+        private Task CopyPrompt(object? parameter, IClientContext clientContext, CancellationToken cancellationToken)
         {
-            Commands.Remove(SelectedNode);
+            if (SelectedNode != null)
+                Clipboard.SetText(SelectedNode.Value);
             return Task.CompletedTask;
         }
 
@@ -112,11 +99,38 @@ namespace REBUSS.PromptManager.PromptToolWindow
             return Task.CompletedTask;
         }
 
-        private Task CopyPrompt(object? parameter, IClientContext clientContext, CancellationToken cancellationToken)
+        private Task RemoveSelectedPrompt(object? parameter, IClientContext clientContext, CancellationToken cancellationToken)
+        {
+            Commands.Remove(SelectedNode);
+            return Task.CompletedTask;
+        }
+
+        private Task SavePrompts(object? parameter, IClientContext clientContext, CancellationToken cancellationToken)
+        {
+            SettingsManager.SaveSettings(Nodes.ToArray());
+            return Task.CompletedTask;
+        }
+
+        private async Task UnselectAll(object? arg1, CancellationToken token)
         {
             if (SelectedNode != null)
-                Clipboard.SetText(SelectedNode.Value);
-            return Task.CompletedTask;
+            {
+                SelectedNode.IsSelected = false;
+            }
+
+            SelectedNode = null;
+        }
+
+        private void UpdateCommands()
+        {
+            if (SelectedNode is Group)
+            {
+                Commands = new Commands((Group)SelectedNode);
+            }
+            else
+            {
+                Commands = new Commands(Group.Root);
+            }
         }
     }
 }

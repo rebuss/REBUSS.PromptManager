@@ -6,20 +6,31 @@ namespace REBUSS.PromptManager.Core.Model
     [DataContract]
     public class Group : Node
     {
-        private static readonly Lazy<Group> _rootInstance = new Lazy<Group>(() => new Group());
-        public static Group Root => _rootInstance.Value;
-
         protected readonly ObservableCollection<Node> _nodes = new ObservableCollection<Node>();
+        private static readonly Lazy<Group> _rootInstance = new Lazy<Group>(() => new Group("Root"));
+        private bool _isExpanded;
 
-        private Group()
+        public Group()
         {
-            Name = "Root";
         }
 
-        public Group(Group parent, string name = "")
+        public Group(string name)
+        {
+            Name = name;
+        }
+
+        public Group(Group parent, string name = "New Group") : this(name)
         {
             Parent = parent;
-            Name = name;
+        }
+
+        public static Group Root => _rootInstance.Value;
+
+        [DataMember]
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set => SetProperty(ref _isExpanded, value);
         }
 
         [DataMember]
@@ -29,7 +40,8 @@ namespace REBUSS.PromptManager.Core.Model
         public override ObservableCollection<Node> Nodes { get => _nodes; }
 
         [DataMember]
-        public override string Value { get => null; set { } }
+        public override string Value
+        { get => null; set { } }
 
         public void AddNewNode()
         {
@@ -41,6 +53,7 @@ namespace REBUSS.PromptManager.Core.Model
         {
             node.Parent = this;
             _nodes.Add(node);
+            IsExpanded = true;
         }
 
         public void SetNodes(Node[] nodes)
