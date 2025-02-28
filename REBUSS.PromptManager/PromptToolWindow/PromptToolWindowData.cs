@@ -89,7 +89,12 @@ namespace REBUSS.PromptManager.PromptToolWindow
         private Task CopyPrompt(object? parameter, IClientContext clientContext, CancellationToken cancellationToken)
         {
             if (SelectedNode != null)
-                Clipboard.SetText(SelectedNode.Value);
+            {
+                var thread = new Thread(() => Clipboard.SetText(SelectedNode.Value));
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
+                thread.Join();
+            }
             return Task.CompletedTask;
         }
 

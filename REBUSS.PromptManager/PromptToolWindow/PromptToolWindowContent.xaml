@@ -10,14 +10,6 @@
         <Grid.InputBindings>
             <KeyBinding Key="Escape" Command="{Binding UnselectAllCommand}" />
         </Grid.InputBindings>
-        <!--<vs:ExtensibilityUICommands.EventHandlers>
-            <vs:EventHandlerCollection>
-                <vs:EventHandler Event="MouseDown"
-                 Command="{Binding UselectAllCommand}"
-                 CommandParameter="{Binding}"
-                 CounterTarget="{Binding RelativeSource={RelativeSource Self}}" />
-            </vs:EventHandlerCollection>
-        </vs:ExtensibilityUICommands.EventHandlers>-->
         <Grid.Resources>
             <Style TargetType="Label" BasedOn="{StaticResource {x:Static styles:VsResourceKeys.ThemedDialogLabelStyleKey}}" />
             <Style TargetType="TextBox" BasedOn="{StaticResource {x:Static styles:VsResourceKeys.TextBoxStyleKey}}" />
@@ -324,6 +316,7 @@
         <TextBlock Text="Edit Prompt" Margin="10,0" 
                    Grid.Row="1"/>
         <TextBox Name="PromptEditor" Margin="10" 
-                 Grid.Row="2"/>
+                 IsEnabled="{Binding SelectedNode.IsPrompt}"
+                 Grid.Row="2" Text="{Binding SelectedNode.Value, Mode=TwoWay, NotifyOnSourceUpdated=True, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </DataTemplate>
